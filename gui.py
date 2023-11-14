@@ -47,7 +47,7 @@ def printKeys(event):
 
 def selectCol(event):
     colSelected = event.x//100
-    print(str(event.x),colSelected)
+    print('index of column selected:',colSelected)
 
 def terminate(event):
     exit()
