@@ -6,7 +6,9 @@ from tkinter import *
 SCALE = 1
 window = Tk()
 
-algorithm = -1
+algoIndex = -1
+
+algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
 
 
 def drag_start(event):
@@ -43,36 +45,47 @@ def drag_motion(event):
 def printKeys(event):
     print(event.keysym+" key pressed")
 
+def selectCol(event):
+    colSelected = event.x//100
+    print(str(event.x),colSelected)
 
 def terminate(event):
     exit()
 
 
 def drawEnvironment():
-    window.geometry(f"{int(SCALE*900)}x{int(SCALE*700)}")
+    window.geometry(f"{int(SCALE*1000)}x{int(SCALE*700)}")
     window.title("connect 4 with AI")
     window.config(background="#404258")
     window.resizable(False,False)
     
-    canvas = Canvas(window,height=600*SCALE,width=600*SCALE,background="#50577A")
+    canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
+    size=50
+    for i in range(6):
+        for j in range(7):
+            canvas.create_oval((5+2*size*j)*SCALE,(5+2*size*i)*SCALE,(2*size*(j+1)-3)*SCALE,(2*size*(i+1)-3)*SCALE,
+                               fill='white',outline='white')
+    
+    # canvas.create_line(0,0,size,size)
     canvas.place(x=250*SCALE,y=10*SCALE)
+    canvas.bind('<Button-1>',selectCol)
 
-def withPrun():
-    global algorithm
-    algorithm = 0
-    print(algorithm)
+def selectWithPrun():
+    global algoIndex
+    algoIndex = 0
+    print(algorithms[algoIndex],"selected")
 
-def whithoutPrun():
-    global algorithm
-    algorithm = 1
-    print(algorithm)
+def selectWhithoutPrun():
+    global algoIndex
+    algoIndex = 1
+    print(algorithms[algoIndex],"selected")
 
-def expectedMinimax():
-    global algorithm
-    algorithm = 2
-    print(algorithm)
+def SelectExpectedMinimax():
+    global algoIndex
+    algoIndex = 2
+    print(algorithms[algoIndex],"selected")
 
-
+# not done yet
 def resetPuzzle(event = None):
     algorithm = -1
     
@@ -107,22 +120,20 @@ def agentTurn():
 
 def drawRadioButtons():
 
-    algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
-
     x = IntVar()
 
     radioB = Radiobutton(window,text=algorithms[0],variable=x,value=0, font=('arial',11),
-                        foreground='#D6E4E5',background="#404258",command=withPrun)
+                        foreground='#D6E4E5',background="#404258",command=selectWithPrun)
     
     radioB.place(x=SCALE*20,y=SCALE*(50))
 
     radioB = Radiobutton(window,text=algorithms[1],variable=x,value=0, font=('arial',11),
-                        foreground='#D6E4E5',background="#404258",command=whithoutPrun)
+                        foreground='#D6E4E5',background="#404258",command=selectWhithoutPrun)
     
     radioB.place(x=SCALE*20,y=SCALE*(50*2))
 
     radioB = Radiobutton(window,text=algorithms[2],variable=x,value=0, font=('arial',11),
-                        foreground='#D6E4E5',background="#404258",command=expectedMinimax)
+                        foreground='#D6E4E5',background="#404258",command=SelectExpectedMinimax)
     
     radioB.place(x=SCALE*20,y=SCALE*(50*3))
 
