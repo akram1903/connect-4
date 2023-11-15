@@ -1,1 +1,54 @@
-loly
+1.lazm kol el game ttmla mn awelha l a5erha
+
+2.representation:
+class game-> int play= 1->7
+             int state
+             int parent
+             int child='none'
+             boolean turn= false->red //// true->yellow *dh 34an n3rf el le3ba el gaya ll yellow wla el red
+
+3. 0->none
+   1->human
+   2->AI
+
+
+4. int winner:
+   0->draw
+   1->human
+   2->AI
+
+
+5.three algorithms :
+(1).minimax without alphabeta pruning   data structure-> ?????   parameters-> ?????
+(2).Minimax with alpha-beta pruning     data structure-> ?????   parameters-> ?????
+(3).Expected Minimax (random move)      data structure-> ?????   parameters-> ?????
+
+6.(3)expected minimax->add 2 integer var:left and right to dedicate wich is better and return to akram GUI only the column that i will play
+
+7.use many height and comment on each height of the tree used and present the best preformance height
+
+8.range->20sec for each move and if it excceded then edit the code  
+
+9.heuristic -> ?????????     
+
+
+
+requirment::::
+1.game GUI
+2.tree in each state of any algorithm
+3.(bonus)->tree is printed using GUI
+4.(bonus)->on the least heurisitc function
+
+
+Akram:
+.GUI
+.minimax without alphabeta pruning
+
+
+Mohamed:
+.Minimax with alpha-beta pruning
+
+
+
+Ashraf:
+.Expected Minimax (random move)
