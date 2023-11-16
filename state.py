@@ -9,7 +9,20 @@
 class State:
     def __init__(self,representation:int,parent=None,children=None):
         self.representation = representation
+    
+    def convertRepresentation(self)->list:
+        temp = self.representation
 
+        result = []
+
+        for i in range(6):
+            tempList =[]
+            for j in range(7):
+                tempList.append(temp%10)
+                temp //= 10
+            result.append(tempList)
+
+        return result
     
     def __str__(self) -> str:
         tempInt = self.representation
@@ -32,4 +45,5 @@ if __name__ == "__main__":
     # tset = State(100000000000000000000000000000000000000001)
     # test = State(123456712345671234567123456712345671234567)
     print(test)
+    print(test.convertRepresentation())
     # print(tset)

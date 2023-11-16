@@ -1,11 +1,18 @@
 
 
 from tkinter import *
+import time
+from state import *
 
-
+TEST_COUNTER=1
 SCALE = 1
+SIZE=50
+respond:bool = True
 window = Tk()
+canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
 
+current_state = State(0)
+    
 algoIndex = -1
 
 algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
@@ -24,6 +31,25 @@ def drag_motion(event):
     widget.place(x=x,y=y)
 
 
+def insertIntoPuzzle(colNumber:int,player:int):
+    #colNumber should be from 0 to 6
+    #player is 1 for human or 2 for ai model
+    global window ,current_state
+    row=5
+    drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
+    window.update()
+    time.sleep(1)
+    tempList = current_state.convertRepresentation()
+    while (row > 0 and tempList[row-1][colNumber]==0):
+        row -= 1
+        drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
+        window.update()
+        time.sleep(1)
+
+    prev_state = current_state
+    current_state = State(parent=current_state,representation=prev_state.representation+player*(10**colNumber)*(10**7)**row)
+    print(current_state)
+    
 
 
 # def goBack(event):
@@ -46,29 +72,42 @@ def printKeys(event):
     print(event.keysym+" key pressed")
 
 def selectCol(event):
-    colSelected = event.x//100
-    print('index of column selected:',colSelected)
+    global respond
+    if respond:
+        respond = False
+        colSelected = 6 - (event.x//100)
+        print('index of column selected:',colSelected)
+        insertIntoPuzzle(colSelected,1)
+        respond = True
+
 
 def terminate(event):
     exit()
 
+def drawState(representation:int):
+
+    global canvas
+    tempInt = representation
+    for i in range(5,-1,-1):
+        for j in range(6,-1,-1):
+            if tempInt % 10 == 0:
+                color = 'white'
+            elif tempInt % 10 == 1:
+                color = 'yellow'
+            else:
+                color = 'red'
+            canvas.create_oval((5+2*SIZE*j)*SCALE,(5+2*SIZE*i)*SCALE,(2*SIZE*(j+1)-3)*SCALE,(2*SIZE*(i+1)-3)*SCALE,
+                               fill=color,outline=color)
+            tempInt //= 10
 
 def drawEnvironment():
     window.geometry(f"{int(SCALE*1000)}x{int(SCALE*700)}")
     window.title("connect 4 with AI")
     window.config(background="#404258")
     window.resizable(False,False)
+        
+    drawState(current_state.representation)
     
-    canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
-    size=50
-    for i in range(6):
-        for j in range(7):
-            canvas.create_oval((5+2*size*j)*SCALE,(5+2*size*i)*SCALE,(2*size*(j+1)-3)*SCALE,(2*size*(i+1)-3)*SCALE,
-                               fill='white',outline='white')
-    
-    # canvas.create_line(0,0,size,size)
-    canvas.place(x=250*SCALE,y=10*SCALE)
-    canvas.bind('<Button-1>',selectCol)
 
 def selectWithPrun():
     global algoIndex
@@ -85,9 +124,9 @@ def SelectExpectedMinimax():
     algoIndex = 2
     print(algorithms[algoIndex],"selected")
 
-# not done yet
 def resetPuzzle(event = None):
     algorithm = -1
+    drawState(0)
     
 
 
@@ -138,14 +177,22 @@ def drawRadioButtons():
     radioB.place(x=SCALE*20,y=SCALE*(50*3))
 
 
+def test(event):
+    global TEST_COUNTER
+    drawState(TEST_COUNTER)
+    TEST_COUNTER += 2
+    TEST_COUNTER *= 10
+
 if __name__ == "__main__":
 
     
     drawEnvironment()
     drawRadioButtons()
-
-
+    
     # keys to input the puzzle to be solved
     window.bind("<Key>",printKeys)
-    
+    canvas.place(x=250*SCALE,y=10*SCALE)
+    canvas.bind('<Button-1>',selectCol)
+    # key to test any action
+    window.bind("<Return>",test)
     window.mainloop()
