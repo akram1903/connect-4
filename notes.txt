@@ -44,20 +44,27 @@ Akram:
 .GUI
 .minimax without alphabeta pruning
 .data structure-> ?????
-.parameters-> ?????
-.returns-> ????
-
+.parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
+.returns-> last State in depth (decrements on child) = 0 which points on its parent
+print the time taken when ai is playing his round using different depth from (3 to 7)
+heuristic -> ????
 
 
 Mohamed:
 .Minimax with alpha-beta pruning
 .data structure-> ?????
-.parameters-> ?????
-.returns-> ????
-
+.parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
+.returns-> last State in depth (decrements on child) = 0 which points on its parent
+print the time taken when ai is playing his round using different depth from (3 to 7)
+heuristic -> ????
 
 Ashraf:
 .Expected Minimax (random move)
 .data structure-> ?????
-.parameters-> ?????
-.returns-> ????
+.parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
+.returns-> last State in depth (decrements on child) = 0 which points on its parent
+print the time taken when ai is playing his round using different depth from (3 to 7)
+heuristic -> ????
+
+side note:  made a folder named minimax and each contributor should put his algorithm class inside it
+            added a heuristic function inside class State, we should discuss its best design and implementation

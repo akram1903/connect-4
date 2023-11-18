@@ -9,6 +9,7 @@
 class State:
     def __init__(self,representation:int,parent=None,children=None):
         self.representation = representation
+        self.children = children
     
     def convertRepresentation(self)->list:
         temp = self.representation
@@ -40,6 +41,10 @@ class State:
 
     def __hash__(self) -> int:
         return self.representation
+    
+    # should be discussed
+    def heuristic(self) -> int:
+        pass
     
 
 if __name__ == "__main__":
