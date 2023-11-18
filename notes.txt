@@ -2,7 +2,7 @@
 
 2.representation:
 class game-> int play= 1->7
-             int state
+             int state  ##convert to 2d list ((((DONE!!))))
              int parent
              int child='none'
              boolean turn= false->red //// true->yellow *dh 34an n3rf el le3ba el gaya ll yellow wla el red
@@ -43,12 +43,21 @@ requirment::::
 Akram:
 .GUI
 .minimax without alphabeta pruning
+.data structure-> ?????
+.parameters-> ?????
+.returns-> ????
+
 
 
 Mohamed:
 .Minimax with alpha-beta pruning
-
+.data structure-> ?????
+.parameters-> ?????
+.returns-> ????
 
 
 Ashraf:
 .Expected Minimax (random move)
+.data structure-> ?????
+.parameters-> ?????
+.returns-> ????

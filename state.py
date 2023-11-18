@@ -21,6 +21,10 @@ class State:
                 tempList.append(temp%10)
                 temp //= 10
             result.append(tempList)
+        for sublist in result:
+               sublist.reverse()
+                  
+        result.reverse()    
 
         return result
     
@@ -41,7 +45,7 @@ class State:
 if __name__ == "__main__":
 
     test = State(111111122222221111111222222211111112222222)
-    test = State(1111)
+    test = State(101100011011111)
     # tset = State(100000000000000000000000000000000000000001)
     # test = State(123456712345671234567123456712345671234567)
     print(test)
