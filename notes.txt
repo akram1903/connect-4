@@ -52,3 +52,6 @@ Mohamed:
 
 Ashraf:
 .Expected Minimax (random move)
+
+side note:  made a folder named minimax and each contributor should put his algorithm class inside it
+            added a heuristic function inside class State, we should discuss its best design and implementation
