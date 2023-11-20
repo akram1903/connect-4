@@ -12,36 +12,29 @@ class State:
         self.children = children
 
 
-    # def makeChildren(self):
-    #     for i in range(6):
-    #         for j in range(7):
-    #             if (self.representation//)%10<
-    #             self.children.append(State(self.representation+j*((10**7)**i)))
+    def makeChildren(self,player:int):
+        for i in range(7):
+            temp = self.insertIntoPuzzle(i,player)
+            if temp is not None:
+                self.children.append(temp)
 
 
     def insertIntoPuzzle(self,colNumber:int,player:int):
         # colNumber should be from 0 to 6
         # player is 1 for human or 2 for ai model
         
-        tempList = current_state.convertRepresentationWithoutReverse()
+        tempList = self.convertRepresentationWithoutReverse()
         if (tempList[5][colNumber]>0):
             print("column is full, you can't push another disk in here")
             return None
         
         row=5
-        # drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
-        # window.update()
-        # time.sleep(.5)
         
         while (row > 0 and tempList[row-1][colNumber]==0):
             row -= 1
-            # drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
-            # window.update()
-            # time.sleep(.5)
+            
+        return State(parent=self,representation=self.representation+player*(10**colNumber)*(10**7)**row)
 
-        prev_state = current_state
-        current_state = State(parent=current_state,representation=prev_state.representation+player*(10**colNumber)*(10**7)**row)
-        print(current_state)
 
     def convertRepresentation(self)->list:
         temp = self.representation
@@ -85,6 +78,8 @@ class State:
         result:str ='\n'
         for i in range(6):
             tempStr = str(tempInt%(10**7))
+            while len(tempStr) < 7:
+                tempStr = '0' + tempStr
             result += tempStr[::-1]+'\n'
             tempInt = tempInt//(10**7)
         result = result[::-1]
