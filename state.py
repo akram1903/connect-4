@@ -7,7 +7,7 @@
 # be represented as 0
 
 class State:
-    def __init__(self,representation:int,parent=None,children:list=None):
+    def __init__(self,representation:int,parent=None,children:list=[]):
         self.representation = representation
         self.children = children
 
@@ -97,6 +97,7 @@ if __name__ == "__main__":
 
     # test = State(111111122222221111111222222211111112222222)
     test = State(101100011011111)
+    # test = State(0)
     # tset = State(100000000000000000000000000000000000000001)
     # test = State(123456712345671234567123456712345671234567)
     print(test)
@@ -104,5 +105,9 @@ if __name__ == "__main__":
     # print(tset)
 
     
-
-    print(test.insertIntoPuzzle(6,1))
+    test.makeChildren(2)
+    i=1
+    for child in test.children:
+        print('child ',i,end='\n\n')
+        print(child)
+        i += 1
