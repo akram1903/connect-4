@@ -1,4 +1,4 @@
-
+import copy
 # we need to discuss representation of the game
 # best representation will be integer representation to reduce space taken
 
@@ -11,7 +11,7 @@ class State:
         self.representation = representation
         self.children = children
         self.heuristic:int = None
-
+        self.parent = parent
 
     def makeChildren(self,player:int):
         for i in range(7):
@@ -34,7 +34,13 @@ class State:
         while (row > 0 and tempList[row-1][colNumber]==0):
             row -= 1
             
-        return State(parent=self,representation=self.representation+player*(10**colNumber)*(10**7)**row)
+        temp = copy.deepcopy(self)
+        temp.children= []
+        temp.representation = self.representation+player*(10**colNumber)*(10**7)**row
+        temp.parent = self
+
+        return temp
+        # return State(parent=self,representation=self.representation+player*(10**colNumber)*(10**7)**row)
 
 
     def convertRepresentation(self)->list:
@@ -204,4 +210,13 @@ if __name__ == "__main__":
 
     test = State(1112111)
 
-    print(test.heuristic())
+    print(test)
+    test.makeChildren(2)
+
+    for child in test.children:
+        print(child)
+        child.makeChildren(1)
+
+    print(test)
+
+    # print(test.heuristic())

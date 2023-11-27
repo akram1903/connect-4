@@ -29,9 +29,9 @@ class MiniMax:
                 state.makeChildren(2)
                 maxEvaState:State = None
 
-                for child in state.children:
-                    if maxEvaState is None or child.heuristic() > maxEvaState.heuristic():
-                        maxEvaState = child
+                for i in range(len(state.children)):
+                    if maxEvaState is None or state.children[i].heuristic() > maxEvaState.heuristic():
+                        maxEvaState = state.children[i]
 
                 return maxEvaState
             
@@ -39,9 +39,9 @@ class MiniMax:
                 minEvaState:State = None
 
                 state.makeChildren(1)
-                for child in state.children:
-                    if minEvaState is None or child.heuristic() < minEvaState.heuristic():
-                        minEvaState = child
+                for i in range(len(state.children)):
+                    if minEvaState is None or state.children[i].heuristic() < minEvaState.heuristic():
+                        minEvaState = state.children[i]
 
                 return minEvaState
         
@@ -49,8 +49,8 @@ class MiniMax:
             state.makeChildren(2)
             maxEvaState:State = None
 
-            for child in state.children:
-                evaState = self.solve(child,depth-1,False)
+            for i in range(len(state.children)):
+                evaState = self.solve(state.children[i],depth-1,False)
                 if maxEvaState is None or evaState.heuristic() > maxEvaState.heuristic():
                     maxEvaState = evaState
 
@@ -60,8 +60,8 @@ class MiniMax:
             minEvaState:State = None
 
             state.makeChildren(1)
-            for child in state.children:
-                evaState = self.solve(child,depth-1,True)
+            for i in range(len(state.children)):
+                evaState = self.solve(state.children[i],depth-1,True)
                 if minEvaState is None or evaState.heuristic() < minEvaState.heuristic():
                     minEvaState = evaState
 
