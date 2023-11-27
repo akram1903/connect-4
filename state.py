@@ -10,6 +10,7 @@ class State:
     def __init__(self,representation:int,parent=None,children:list=[]):
         self.representation = representation
         self.children = children
+        self.heuristic:int = None
 
 
     def makeChildren(self,player:int):
@@ -90,24 +91,117 @@ class State:
     
     # should be discussed
     def heuristic(self) -> int:
-        pass
+        if self.heuristic is not None:
+            return self.heuristic
+    # this heuristic is only for test .. this is a simple heuristic
+        temp = self.convertRepresentationWithoutReverse()
+        player = 2
+        opponent = 1
+        player_score = 0
+        opponent_score = 0
+
+        # Evaluate horizontally
+        for row in range(6):
+            for col in range(7 - 3):
+                window = [temp[row][col + i] for i in range(4)]
+                player_count = window.count(player)
+                opponent_count = window.count(opponent)
+                if player_count == 4:
+                    player_score += 100
+                elif player_count == 3 and window.count(0) == 1:
+                    player_score += 5
+                elif player_count == 2 and window.count(0) == 2:
+                    player_score += 2
+
+                if opponent_count == 4:
+                    opponent_score += 100
+                elif opponent_count == 3 and window.count(0) == 1:
+                    opponent_score += 5
+                elif opponent_count == 2 and window.count(0) == 2:
+                    opponent_score += 2
+
+        # Evaluate vertically
+        for col in range(7):
+            for row in range(6 - 3):
+                window = [temp[row + i][col] for i in range(4)]
+                player_count = window.count(player)
+                opponent_count = window.count(opponent)
+                if player_count == 4:
+                    player_score += 100
+                elif player_count == 3 and window.count(0) == 1:
+                    player_score += 5
+                elif player_count == 2 and window.count(0) == 2:
+                    player_score += 2
+
+                if opponent_count == 4:
+                    opponent_score += 100
+                elif opponent_count == 3 and window.count(0) == 1:
+                    opponent_score += 5
+                elif opponent_count == 2 and window.count(0) == 2:
+                    opponent_score += 2
+
+        # Evaluate diagonally (top-left to bottom-right)
+        for row in range(6 - 3):
+            for col in range(7 - 3):
+                window = [temp[row + i][col + i] for i in range(4)]
+                player_count = window.count(player)
+                opponent_count = window.count(opponent)
+                if player_count == 4:
+                    player_score += 100
+                elif player_count == 3 and window.count(0) == 1:
+                    player_score += 5
+                elif player_count == 2 and window.count(0) == 2:
+                    player_score += 2
+
+                if opponent_count == 4:
+                    opponent_score += 100
+                elif opponent_count == 3 and window.count(0) == 1:
+                    opponent_score += 5
+                elif opponent_count == 2 and window.count(0) == 2:
+                    opponent_score += 2
+
+        # Evaluate diagonally (bottom-left to top-right)
+        for row in range(3, 6):
+            for col in range(7 - 3):
+                window = [temp[row - i][col + i] for i in range(4)]
+                player_count = window.count(player)
+                opponent_count = window.count(opponent)
+                if player_count == 4:
+                    player_score += 100
+                elif player_count == 3 and window.count(0) == 1:
+                    player_score += 5
+                elif player_count == 2 and window.count(0) == 2:
+                    player_score += 2
+
+                if opponent_count == 4:
+                    opponent_score += 100
+                elif opponent_count == 3 and window.count(0) == 1:
+                    opponent_score += 5
+                elif opponent_count == 2 and window.count(0) == 2:
+                    opponent_score += 2
+
+        return player_score - opponent_score
     
     
 if __name__ == "__main__":
 
     # test = State(111111122222221111111222222211111112222222)
-    test = State(101100011011111)
+    # test = State(101100011011111)
     # test = State(0)
     # tset = State(100000000000000000000000000000000000000001)
     # test = State(123456712345671234567123456712345671234567)
-    print(test)
+    # print(test)
     # print(test.convertRepresentation())
     # print(tset)
 
     
-    test.makeChildren(2)
-    i=1
-    for child in test.children:
-        print('child ',i,end='\n\n')
-        print(child)
-        i += 1
+    # test.makeChildren(2)
+    # i=1
+    # for child in test.children:
+    #     print('child ',i,end='\n\n')
+    #     print(child)
+    #     i += 1
+
+    test = State(1112111)
+
+    print(test.heuristic())
