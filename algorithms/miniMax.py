@@ -19,59 +19,71 @@ from state import State
 
 class MiniMax:
     
-    def __init__(self,currentState:State):
-        self.currentState = currentState
+    def __init__(self):
+        pass
 
-    def solve(self,state:State,depth:int,maximizingPlayer:bool)->State:
+    def solve(self,state:State,depth:int,maximizingPlayer:bool)->list[int,State]:
         # maximizing is AI ,minimizing is human
         if depth == 1:
             if maximizingPlayer:
                 state.makeChildren(2)
-                maxEvaState:State = None
+                maxEvaState = None
 
                 for i in range(len(state.children)):
-                    if maxEvaState is None or state.children[i].heuristic() > maxEvaState.heuristic():
-                        maxEvaState = state.children[i]
+                    if maxEvaState is None or state.children[i].Heuristic() > maxEvaState[1].Heuristic():
+                        maxEvaState = [i,state.children[i]]
 
-                return maxEvaState
+                if maxEvaState is not None:
+                    return maxEvaState
+                return [state.parCol,state.Heuristic()]
             
             else:
-                minEvaState:State = None
+                minEvaState = None
 
                 state.makeChildren(1)
                 for i in range(len(state.children)):
-                    if minEvaState is None or state.children[i].heuristic() < minEvaState.heuristic():
-                        minEvaState = state.children[i]
+                    if minEvaState is None or state.children[i].Heuristic() < minEvaState[1].Heuristic():
+                        minEvaState = [i,state.children[i]]
 
-                return minEvaState
-        
+                if minEvaState is not None:
+                    return minEvaState
+                
+                return [state.parCol,state.Heuristic()]
+
         if maximizingPlayer:
             state.makeChildren(2)
-            maxEvaState:State = None
+            maxEvaState = None
 
             for i in range(len(state.children)):
                 evaState = self.solve(state.children[i],depth-1,False)
-                if maxEvaState is None or evaState.heuristic() > maxEvaState.heuristic():
+                if maxEvaState is None or evaState[1].Heuristic() > maxEvaState[1].Heuristic():
                     maxEvaState = evaState
 
-            return maxEvaState
-        
+
+            if maxEvaState is not None:
+                return maxEvaState
+
+            return [state.parCol,state.Heuristic()]
         else:
-            minEvaState:State = None
+            minEvaState = None
 
             state.makeChildren(1)
             for i in range(len(state.children)):
                 evaState = self.solve(state.children[i],depth-1,True)
-                if minEvaState is None or evaState.heuristic() < minEvaState.heuristic():
+                if minEvaState is None or evaState[1].Heuristic() < minEvaState[1].Heuristic():
                     minEvaState = evaState
 
-            return minEvaState
+            if minEvaState is not None: 
+                return minEvaState
+            
+            return [state.parCol,state.Heuristic()]
         
 
 if __name__ == "__main__":
-    test = State(1000)
+    test = State(12121)
     print(test)
-    alg = MiniMax(test)
-    result = alg.solve(test,4,True)
+    alg = MiniMax()
+    result = alg.solve(test,3,True)
 
-    print(result)
+    print(result[0])
+    print(result[1])

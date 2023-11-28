@@ -3,6 +3,7 @@
 from tkinter import *
 import time
 from state import *
+from algorithms.miniMax import *
 
 TEST_COUNTER=1
 SCALE = 1
@@ -14,7 +15,7 @@ canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
 current_state = State(0)
     
 algoIndex = -1
-
+agent = None
 algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
 
 
@@ -39,7 +40,7 @@ def insertIntoPuzzle(colNumber:int,player:int):
     tempList = current_state.convertRepresentationWithoutReverse()
     if (tempList[5][colNumber]>0):
         print("column is full, you can't push another disk in here")
-        return
+        return False
     
     row=5
     drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
@@ -56,7 +57,7 @@ def insertIntoPuzzle(colNumber:int,player:int):
     current_state = State(parent=current_state,representation=prev_state.representation+player*(10**colNumber)*(10**7)**row)
     print(current_state)
     
-
+    return True
 
 # def goBack(event):
 #     global solutionIndex
@@ -84,7 +85,10 @@ def selectCol(event):
         colSelected = 6 - (event.x//100)
         print('index of column selected:',colSelected)
         insertIntoPuzzle(colSelected,1)
+
+        agentTurn()
         respond = True
+
 
 
 def terminate(event):
@@ -121,8 +125,9 @@ def selectWithPrun():
     print(algorithms[algoIndex],"selected")
 
 def selectWhithoutPrun():
-    global algoIndex
+    global algoIndex,agent
     algoIndex = 1
+    
     print(algorithms[algoIndex],"selected")
 
 def SelectExpectedMinimax():
@@ -161,7 +166,15 @@ def resetPuzzle(event = None):
         
 
 def agentTurn():
-    pass
+    global agent,current_state
+
+    current_state.children = []
+    if agent is None:
+        agent = MiniMax()
+
+    maxDepth = 3    
+    answer = agent.solve(current_state,maxDepth,True)
+    insertIntoPuzzle(answer[0],2)
 
 def drawRadioButtons():
 

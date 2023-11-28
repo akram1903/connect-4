@@ -12,6 +12,7 @@ class State:
         self.children = children
         self.heuristic:int = None
         self.parent = parent
+        self.parCol = None
 
     def makeChildren(self,player:int):
         for i in range(7):
@@ -26,7 +27,7 @@ class State:
         
         tempList = self.convertRepresentationWithoutReverse()
         if (tempList[5][colNumber]>0):
-            print("column is full, you can't push another disk in here")
+            # print("column is full, you can't push another disk in here")
             return None
         
         row=5
@@ -35,6 +36,7 @@ class State:
             row -= 1
             
         temp = copy.deepcopy(self)
+        temp.parCol = colNumber
         temp.children= []
         temp.representation = self.representation+player*(10**colNumber)*(10**7)**row
         temp.parent = self
@@ -96,7 +98,7 @@ class State:
         return self.representation
     
     # should be discussed
-    def heuristic(self) -> int:
+    def Heuristic(self) -> int:
         if self.heuristic is not None:
             return self.heuristic
     # this heuristic is only for test .. this is a simple heuristic
@@ -208,15 +210,15 @@ if __name__ == "__main__":
     #     print(child)
     #     i += 1
 
-    test = State(1112111)
+    test = State(111)
 
     print(test)
     test.makeChildren(2)
 
-    for child in test.children:
-        print(child)
-        child.makeChildren(1)
+    # for child in test.children:
+    #     print(child)
+    #     child.makeChildren(1)
 
-    print(test)
+    # print(test)
 
-    # print(test.heuristic())
+    print(test.Heuristic())
