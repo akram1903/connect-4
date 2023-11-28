@@ -5,12 +5,19 @@ import time
 from state import *
 from algorithms.miniMax import *
 
+
 TEST_COUNTER=1
 SCALE = 1
 SIZE=50
 respond:bool = True
 window = Tk()
 canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
+
+# data collection for report
+countAgentPlays = 0
+avgResponseTime = None
+# end data collection
+
 
 current_state = State(0)
     
@@ -115,6 +122,12 @@ def drawEnvironment():
     window.title("connect 4 with AI")
     window.config(background="#404258")
     window.resizable(False,False)
+    lable = Label(window,text="avg response time = ",font=('Arial',11),foreground='#D6E4E5',background="#404258")
+    lable.place(x=450*SCALE,y=640*SCALE)
+    global dataCollectionLable
+    dataCollectionLable = Label(window,text="",font=('Arial',11),foreground='#D6E4E5',background="#404258")
+    dataCollectionLable.place(x=600,y=640*SCALE)
+    # dataCollectionLable.config
         
     drawState(current_state.representation)
     
@@ -166,14 +179,24 @@ def resetPuzzle(event = None):
         
 
 def agentTurn():
-    global agent,current_state
+    global agent,current_state,dataCollectionLable,countAgentPlays,avgResponseTime
 
     current_state.children = []
     if agent is None:
         agent = MiniMax()
 
-    maxDepth = 3    
+    maxDepth = 3
+
+    startTime = time.time()    
     answer = agent.solve(current_state,maxDepth,True)
+    t = time.time()-startTime
+
+    if avgResponseTime is None:
+        avgResponseTime = t
+    else:
+        avgResponseTime = (avgResponseTime*countAgentPlays+t)/(countAgentPlays+1)
+    countAgentPlays += 1
+    dataCollectionLable.config(text=f'{avgResponseTime} secs')
     insertIntoPuzzle(answer[0],2)
 
 def drawRadioButtons():
