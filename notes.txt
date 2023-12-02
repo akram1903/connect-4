@@ -19,9 +19,9 @@ class game-> int play= 1->7
 
 
 5.three algorithms :
-(1).minimax without alphabeta pruning   data structure-> ?????   parameters-> ?????
-(2).Minimax with alpha-beta pruning     data structure-> ?????   parameters-> ?????
-(3).Expected Minimax (random move)      data structure-> ?????   parameters-> ?????
+(1).minimax without alphabeta pruning   data structure-> ?????   parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
+(2).Minimax with alpha-beta pruning     data structure-> ?????   parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
+(3).Expected Minimax (random move)      data structure-> ?????   parameters-> fun(self,state:State,depth:int,maximizingPlayer:bool)
 
 6.(3)expected minimax->add 2 integer var:left and right to dedicate wich is better and return to akram GUI only the column that i will play
 
