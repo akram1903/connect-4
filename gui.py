@@ -3,6 +3,8 @@
 from tkinter import *
 import time
 from state import *
+from algorithms.miniMax import *
+
 
 TEST_COUNTER=1
 SCALE = 1
@@ -11,10 +13,16 @@ respond:bool = True
 window = Tk()
 canvas = Canvas(window,height=600*SCALE,width=700*SCALE,background="#50577A")
 
+# data collection for report
+countAgentPlays = 0
+avgResponseTime = None
+# end data collection
+
+
 current_state = State(0)
     
 algoIndex = -1
-
+agent = None
 algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
 
 
@@ -35,22 +43,28 @@ def insertIntoPuzzle(colNumber:int,player:int):
     #colNumber should be from 0 to 6
     #player is 1 for human or 2 for ai model
     global window ,current_state
+    
+    tempList = current_state.convertRepresentationWithoutReverse()
+    if (tempList[5][colNumber]>0):
+        print("column is full, you can't push another disk in here")
+        return False
+    
     row=5
     drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
     window.update()
-    time.sleep(1)
-    tempList = current_state.convertRepresentation()
+    time.sleep(.5)
+    
     while (row > 0 and tempList[row-1][colNumber]==0):
         row -= 1
         drawState(current_state.representation+player*(10**colNumber)*(10**7)**row)
         window.update()
-        time.sleep(1)
+        time.sleep(.5)
 
     prev_state = current_state
     current_state = State(parent=current_state,representation=prev_state.representation+player*(10**colNumber)*(10**7)**row)
     print(current_state)
     
-
+    return True
 
 # def goBack(event):
 #     global solutionIndex
@@ -78,7 +92,10 @@ def selectCol(event):
         colSelected = 6 - (event.x//100)
         print('index of column selected:',colSelected)
         insertIntoPuzzle(colSelected,1)
+
+        agentTurn()
         respond = True
+
 
 
 def terminate(event):
@@ -105,6 +122,12 @@ def drawEnvironment():
     window.title("connect 4 with AI")
     window.config(background="#404258")
     window.resizable(False,False)
+    lable = Label(window,text="avg response time = ",font=('Arial',11),foreground='#D6E4E5',background="#404258")
+    lable.place(x=450*SCALE,y=640*SCALE)
+    global dataCollectionLable
+    dataCollectionLable = Label(window,text="",font=('Arial',11),foreground='#D6E4E5',background="#404258")
+    dataCollectionLable.place(x=600,y=640*SCALE)
+    # dataCollectionLable.config
         
     drawState(current_state.representation)
     
@@ -115,8 +138,9 @@ def selectWithPrun():
     print(algorithms[algoIndex],"selected")
 
 def selectWhithoutPrun():
-    global algoIndex
+    global algoIndex,agent
     algoIndex = 1
+    
     print(algorithms[algoIndex],"selected")
 
 def SelectExpectedMinimax():
@@ -155,7 +179,25 @@ def resetPuzzle(event = None):
         
 
 def agentTurn():
-    pass
+    global agent,current_state,dataCollectionLable,countAgentPlays,avgResponseTime
+
+    current_state.children = []
+    if agent is None:
+        agent = MiniMax()
+
+    maxDepth = 3
+
+    startTime = time.time()    
+    answer = agent.solve(current_state,maxDepth,True)
+    t = time.time()-startTime
+
+    if avgResponseTime is None:
+        avgResponseTime = t
+    else:
+        avgResponseTime = (avgResponseTime*countAgentPlays+t)/(countAgentPlays+1)
+    countAgentPlays += 1
+    dataCollectionLable.config(text=f'{avgResponseTime} secs')
+    insertIntoPuzzle(answer[0],2)
 
 def drawRadioButtons():
 
