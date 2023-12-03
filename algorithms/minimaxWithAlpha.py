@@ -1,8 +1,9 @@
+# Import necessary library
 import random
 
 # Function to initialize the game state
 def initialize_game():
-    return [0] * 42  # Initialize the empty board
+    return [0]*42  # Initialize the empty board
 
 # Function to check if the board is full
 def is_full(state):
@@ -84,32 +85,35 @@ def count_potential_sequences(state, player):
                         potential_sequences += 1
     return potential_sequences
 
-# Function to calculate the expected minimax value with alpha-beta pruning
-def minimax(state, depth, player, alpha, beta):
+# Function to calculate the expected minimax value and return the states list
+def expected_minimax(state, depth, player):
+    state_list = []
+    state_list.append(state)
+    
     if depth == 0 or is_full(state):
-        return heuristic(state)
+        return heuristic(state), state_list
 
     available_moves = get_available_moves(state)
-    if player:  # Maximizing player (AI)
+    if player:
         max_eval = float('-inf')
         for move in available_moves:
-            new_state = apply_move(state, move, 2)
-            eval = minimax(new_state, depth - 1, not player, alpha, beta)
-            max_eval = max(max_eval, eval)
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break  # Beta cutoff
-        return max_eval
-    else:  # Minimizing player (Human)
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval > max_eval:
+                max_eval = eval
+                state_list.extend(new_states)
+        return max_eval, state_list
+    else:
         min_eval = float('inf')
         for move in available_moves:
-            new_state = apply_move(state, move, 1)
-            eval = minimax(new_state, depth - 1, not player, alpha, beta)
-            min_eval = min(min_eval, eval)
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break  # Alpha cutoff
-        return min_eval
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval < min_eval:
+                min_eval = eval
+                state_list.extend(new_states)
+        return min_eval, state_list
 
 # Function to get the best move using minimax with alpha-beta pruning
 def get_best_move(state, depth):
@@ -118,8 +122,9 @@ def get_best_move(state, depth):
     available_moves = get_available_moves(state)
     for move in available_moves:
         next_player = False  # The AI is playing
+
         new_state = apply_move(state, move, 2)  # AI's move
-        eval = minimax(new_state, depth - 1, next_player, float('-inf'), float('inf'))
+        eval = expected_minimax(new_state, depth - 1, next_player)[0]
         if eval > max_eval:
             max_eval = eval
             best_move = move
@@ -132,7 +137,7 @@ def print_board(state):
         print(row)
     print()
 
-# Function to play the game
+# Main function to play the game
 def play_game():
     state_list = []
     current_state = initialize_game()
@@ -199,22 +204,8 @@ def main():
         print("Human Wins!")
     else:
         print("It's a Tie!")
-    
+
     return states_list
 
 if __name__ == "__main__":
     final_states_list = main()
-    print( final_states_list)
-
-
-
-
-
-
-
-
-
-
-
-
-
