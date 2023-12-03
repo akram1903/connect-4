@@ -80,7 +80,7 @@ class MiniMax:
         
 
 if __name__ == "__main__":
-    test = State(12121)
+    test = State(1112121212121212121212121122122121212)
     print(test)
     alg = MiniMax()
     result = alg.solve(test,3,True)

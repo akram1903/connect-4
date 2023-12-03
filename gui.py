@@ -4,7 +4,8 @@ from tkinter import *
 import time
 from state import *
 from algorithms.miniMax import *
-
+from algorithms.ExpectedMinimax import *
+from algorithms.minimaxWithAlpha import *
 
 TEST_COUNTER=1
 SCALE = 1
@@ -182,10 +183,25 @@ def agentTurn():
     global agent,current_state,dataCollectionLable,countAgentPlays,avgResponseTime
 
     current_state.children = []
+    current_state.parent = None
     if agent is None:
-        agent = MiniMax()
+        if algoIndex==1:
+            agent = MiniMax()
+        elif algoIndex==0:
+            agent = None
+            print("not implemented yet")
+            return
+        elif algoIndex==2:
+            agent = None
+            print("not implemented yet")
+            return
 
-    maxDepth = 3
+        else:
+            print("no agent selected","select an agent to start game",sep='\n')
+            current_state = State(0)
+            drawState(0)
+            return
+    maxDepth = 4
 
     startTime = time.time()    
     answer = agent.solve(current_state,maxDepth,True)
