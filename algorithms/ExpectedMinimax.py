@@ -1,181 +1,241 @@
 import random
 
-WIDTH = 7
-HEIGHT = 6
-AI = 2
-HUMAN = 1
-EMPTY = 0
-PROBABILITY = [0.6, 0.4]  # Probability of disc falling in chosen column and adjacent columns
+# Function to initialize the game state
+def initialize_game():
+    return [0]*42  # Initialize the empty board
 
-# Create an empty board
-def create_board():
-    board = [[EMPTY] * WIDTH for _ in range(HEIGHT)]
-    return board
+# Function to check if the board is full
+def is_full(state):
+    return 0 not in state
 
-# Check if a column is full
-def is_column_full(board, col):
-    return board[0][col] != EMPTY
+# Function to get available moves in the current state
+def get_available_moves(state):
+    available_moves = []
+    for i in range(7):
+        if state[i] == 0:
+            available_moves.append(i)
+    return available_moves
 
-# Drop a disc in a column
-def drop_disc(board, col, disc):
-    for row in range(HEIGHT - 1, -1, -1):
-        if board[row][col] == EMPTY:
-            board[row][col] = disc
-            return True
-    return False
+# Function to apply a move on the board
+def apply_move(state, move, player):
+    new_state = state[:]
+    for i in range(5, -1, -1):
+        if new_state[i * 7 + move] == 0:
+            new_state[i * 7 + move] = player
+            break
+    return new_state
 
-# Get the available columns to drop a disc
-def get_available_columns(board):
-    return [col for col in range(WIDTH) if not is_column_full(board, col)]
+# Function to count sequences of a player in the current state
+def count_sequences(state, player):
+    sequences = 0
+    for i in range(3):
+        for j in range(7):
+            if state[i * 7 + j] == state[(i + 1) * 7 + j] == state[(i + 2) * 7 + j] == state[(i + 3) * 7 + j] == player:
+                sequences += 1  # Vertical sequence
+    for i in range(6):
+        for j in range(4):
+            if state[i * 7 + j] == state[i * 7 + j + 1] == state[i * 7 + j + 2] == state[i * 7 + j + 3] == player:
+                sequences += 1  # Horizontal sequence
+    for i in range(3, 6):
+        for j in range(4):
+            if state[i * 7 + j] == state[(i - 1) * 7 + j + 1] == state[(i - 2) * 7 + j + 2] == state[(i - 3) * 7 + j + 3] == player:
+                sequences += 1  # Diagonal sequence (from bottom-left to top-right)
+    for i in range(3):
+        for j in range(4):
+            if state[i * 7 + j] == state[(i + 1) * 7 + j + 1] == state[(i + 2) * 7 + j + 2] == state[(i + 3) * 7 + j + 3] == player:
+                sequences += 1  # Diagonal sequence (from top-left to bottom-right)
+    return sequences
 
-# Check if the board is full
-def is_board_full(board):
-    return all(is_column_full(board, col) for col in range(WIDTH))
+# Function to calculate heuristic value of the state
+def heuristic(state):
+    ai_sequences = count_sequences(state, 2)
+    human_sequences = count_sequences(state, 1)
 
-# Check if a player has won
-def is_winner(board, player):
-    # Check rows
-    for row in range(HEIGHT):
-        for col in range(WIDTH - 3):
-            if board[row][col] == player and board[row][col + 1] == player and board[row][col + 2] == player and board[row][col + 3] == player:
-                return True
-    # Check columns
-    for col in range(WIDTH):
-        for row in range(HEIGHT - 3):
-            if board[row][col] == player and board[row + 1][col] == player and board[row + 2][col] == player and board[row + 3][col] == player:
-                return True
-    # Check diagonal (top-left to bottom-right)
-    for row in range(HEIGHT - 3):
-        for col in range(WIDTH - 3):
-            if board[row][col] == player and board[row + 1][col + 1] == player and board[row + 2][col + 2] == player and board[row + 3][col + 3] == player:
-                return True
-    # Check diagonal (bottom-left to top-right)
-    for row in range(3, HEIGHT):
-        for col in range(WIDTH - 3):
-            if board[row][col] == player and board[row - 1][col + 1] == player and board[row - 2][col + 2] == player and board[row - 3][col + 3] == player:
-                return True
-    return False
+    # Potential future sequences
+    ai_potential = count_potential_sequences(state, 2)
+    human_potential = count_potential_sequences(state, 1)
 
-# Evaluate the heuristic value of the board for the AI player
-def evaluate(board):
-    ai_score = 0
-    human_score = 0
-
-    # Check rows
-    for row in range(HEIGHT):
-        for col in range(WIDTH - 3):
-            window = board[row][col:col+4]
-            ai_score += evaluate_window(window, AI)
-            human_score += evaluate_window(window, HUMAN)
-
-    # Check columns
-    for col in range(WIDTH):
-        for row in range(HEIGHT - 3):
-            window = [board[row+i][col] for i in range(4)]
-            ai_score += evaluate_window(window, AI)
-            human_score += evaluate_window(window, HUMAN)
-
-    # Check diagonal (top-left to bottom-right)
-    for row in range(HEIGHT - 3):
-        for col in range(WIDTH - 3):
-            window = [board[row+i][col+i] for i in range(4)]
-            ai_score += evaluate_window(window, AI)
-            human_score += evaluate_window(window, HUMAN)
-
-    # Check diagonal (bottom-left to top-right)
-    for row in range(3, HEIGHT):
-        for col in range(WIDTH - 3):
-            window = [board[row-i][col+i] for i in range(4)]
-            ai_score += evaluate_window(window, AI)
-            human_score += evaluate_window(window, HUMAN)
+    # Evaluate the state based on sequences and potential future sequences
+    ai_score = ai_sequences * 100 + ai_potential * 10
+    human_score = human_sequences * 100 + human_potential * 10
 
     return ai_score - human_score
 
-# Evaluate a window of 4 cells
-def evaluate_window(window, player):
-    score = 0
-    opponent = HUMAN if player == AI else AI
+def count_potential_sequences(state, player):
+    potential_sequences = 0
+    for i in range(6):
+        for j in range(7):
+            if state[i * 7 + j] == player:
+                # Check horizontally
+                if j < 4:
+                    if state[i * 7 + j + 1] == state[i * 7 + j + 2] == state[i * 7 + j + 3] == 0:
+                        potential_sequences += 1
+                # Check vertically
+                if i < 3:
+                    if state[(i + 1) * 7 + j] == state[(i + 2) * 7 + j] == state[(i + 3) * 7 + j] == 0:
+                        potential_sequences += 1
+                # Check diagonally (bottom-left to top-right)
+                if j < 4 and i < 3:
+                    if state[(i + 1) * 7 + j + 1] == state[(i + 2) * 7 + j + 2] == state[(i + 3) * 7 + j + 3] == 0:
+                        potential_sequences += 1
+                # Check diagonally (top-left to bottom-right)
+                if j < 4 and i > 2:
+                    if state[(i - 1) * 7 + j + 1] == state[(i - 2) * 7 + j + 2] == state[(i - 3) * 7 + j + 3] == 0:
+                        potential_sequences += 1
+    return potential_sequences
 
-    if window.count(player) == 4:
-        score += 100
-    elif window.count(player) == 3 and window.count(EMPTY) == 1:
-        score += 5
-    elif window.count(player) == 2 and window.count(EMPTY) == 2:
-       score += 2
+# Function to calculate the expected minimax value and return the states list
+def expected_minimax(state, depth, player):
+    state_list = []
+    state_list.append(state)
+    
+    if depth == 0 or is_full(state):
+        return heuristic(state), state_list
 
-    if window.count(opponent) == 3 and window.count(EMPTY) == 1:
-        score -= 4
-
-    return score
-
-# Get the best column for the AI player to play
-def get_best_column(board, depth, maximizing_player):
-    available_columns = get_available_columns(board)
-
-    if depth == 0 or is_board_full(board) or is_winner(board, AI) or is_winner(board, HUMAN):
-        return None, evaluate(board)
-
-    if maximizing_player:
-        max_value = float('-inf')
-        best_column = random.choice(available_columns)
-
-        for col in available_columns:
-            new_board = [row[:] for row in board]
-            drop_disc(new_board, col, AI)
-            _, value = get_best_column(new_board, depth - 1, False)
-
-            if value > max_value:
-                max_value = value
-                best_column = col
-
-        return best_column, max_value
+    available_moves = get_available_moves(state)
+    if player:
+        max_eval = float('-inf')
+        for move in available_moves:
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval > max_eval:
+                max_eval = eval
+                state_list.extend(new_states)
+        return max_eval, state_list
     else:
-        min_value = float('inf')
-        best_column = random.choice(available_columns)
+        min_eval = float('inf')
+        for move in available_moves:
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval < min_eval:
+                min_eval = eval
+                state_list.extend(new_states)
+        return min_eval, state_list
 
-        for col in available_columns:
-            new_board = [row[:] for row in board]
-            drop_disc(new_board, col, HUMAN)
-            _, value = get_best_column(new_board, depth - 1, True)
+# Adjusted get_best_move function to include probability-based disc placement
+def get_best_move(state, depth):
+    best_move = None
+    max_eval = float('-inf')
+    available_moves = get_available_moves(state)
+    for move in available_moves:
+        next_player = False  # The AI is playing
 
-            if value < min_value:
-                min_value = value
-                best_column = col
+        # Adjust probabilities for left and right adjacent columns
+        if move > 0 and move < 6:
+            moves = [move-1, move, move+1]
+            probabilities = [0.4, 0.6, 0.4]
+        elif move == 0:
+            moves = [move, move+1]
+            probabilities = [0.6, 0.4]
+        else:  # move == 6
+            moves = [move-1, move]
+            probabilities = [0.4, 0.6]
 
-        return best_column, min_value
+        # Randomly select a move based on probabilities
+        chosen_move = random.choices(moves, probabilities)[0]
 
-# Play the game
-def play_game():
-    board = create_board()
-    print_board(board)
-    turn = HUMAN
+        new_state = apply_move(state, chosen_move, 2)  # AI's move
+        eval = expected_minimax(new_state, depth - 1, next_player)[0]
+        if eval > max_eval:
+            max_eval = eval
+            best_move = chosen_move
+    return best_move
 
-    while not is_board_full(board):
-        if turn == HUMAN:
-            col = int(input("Choose a column to play (0-6): "))
-            if col not in get_available_columns(board):
-                print("Invalid column. Please choose a different column.")
-                continue
-        else:
-            col, _ = get_best_column(board, 5, True)
-            print("AI plays column", col)
-
-        drop_disc(board, col, turn)
-        print_board(board)
-
-        if is_winner(board, turn):
-            print("Player", turn, "wins!")
-            return
-
-        turn = AI if turn == HUMAN else HUMAN
-
-    print("It's a tie!")
-
-# Print the board
-def print_board(board):
-    for row in board:
+# Function to print the board
+def print_board(state):
+    for i in range(6):
+        row = state[i * 7: (i + 1) * 7]
         print(row)
     print()
 
-# Start the game
-play_game()
+# Main function to print and call expected minimax function
+# ... (previous code remains the same)
+
+# Function to play the game
+# Function to play the game
+# Function to play the game
+def play_game():
+    state_list = []
+    current_state = initialize_game()
+    print("Initial Board:")
+    print_board(current_state)
+    state_list.append(current_state)
+
+    while not is_full(current_state):
+        # AI's turn
+        ai_move = get_best_move(current_state, 4)
+        current_state = apply_move(current_state, ai_move, 2)
+        print("\nAfter AI's Move:")
+        print_board(current_state)
+        state_list.append(current_state)
+
+        if is_full(current_state):
+            break
+
+        # Human's turn
+        while True:
+            try:
+                human_move = int(input("Your turn - Enter column (0-6): "))
+                if human_move < 0 or human_move > 6:
+                    raise ValueError("Column number out of range. Please enter a number between 0 and 6.")
+                if human_move not in get_available_moves(current_state):
+                    raise ValueError("Column is full. Choose another column.")
+                break
+            except ValueError as e:
+                print(f"Error: {e}")
+
+        current_state = apply_move(current_state, human_move, 1)
+        print("\nAfter Your Move:")
+        print_board(current_state)
+        state_list.append(current_state)
+
+    final_state = current_state
+    ai_sequences = count_sequences(final_state, 2)
+    human_sequences = count_sequences(final_state, 1)
+
+    print("\nGame Over!")
+    print(f"AI Sequences: {ai_sequences}")
+    print(f"Human Sequences: {human_sequences}")
+    if ai_sequences > human_sequences:
+        print("AI Wins!")
+    elif ai_sequences < human_sequences:
+        print("Human Wins!")
+    else:
+        print("It's a Tie!")
+
+    return state_list, final_state
+
+# Main function to run the game
+def main():
+    states_list, final_state = play_game()
+    ai_sequences_final = count_sequences(final_state, 2)
+    human_sequences_final = count_sequences(final_state, 1)
+    print("\nFinal State:")
+    print_board(final_state)
+    print(f"AI Sequences in Final State: {ai_sequences_final}")
+    print(f"Human Sequences in Final State: {human_sequences_final}")
+    if ai_sequences_final > human_sequences_final:
+        print("AI Wins!")
+    elif ai_sequences_final < human_sequences_final:
+        print("Human Wins!")
+    else:
+        print("It's a Tie!")
+    
+    return states_list
+
+if __name__ == "__main__":
+    final_states_list = main()
+
+
+
+
+
+
+
+
+
+
+
+
