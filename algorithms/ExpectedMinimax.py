@@ -1,8 +1,25 @@
 import random
-
+import sys
+import os
+import math
+# getting the name of the directory
+# where the this file is present.
+current = os.path.dirname(os.path.realpath(__file__))
+ 
+# Getting the parent directory name
+# where the current directory is present.
+parent = os.path.dirname(current)
+ 
+# adding the parent directory to 
+# the sys.path.
+sys.path.append(parent)
+ 
+# now we can import the module in the parent
+# directory.
+from state import State
 # Function to initialize the game state
 def initialize_game():
-    return [0] * 42  # Initialize the empty board
+    return [0]*42  # Initialize the empty board
 
 # Function to check if the board is full
 def is_full(state):
@@ -13,7 +30,7 @@ def get_available_moves(state):
     available_moves = []
     for i in range(7):
         if state[i] == 0:
-            available_moves.append(i)
+            available_moves.append(math.ceil(i//7))
     return available_moves
 
 # Function to apply a move on the board
@@ -84,46 +101,72 @@ def count_potential_sequences(state, player):
                         potential_sequences += 1
     return potential_sequences
 
-# Function to calculate the expected minimax value with alpha-beta pruning
-def minimax(state, depth, player, alpha, beta):
+# Function to calculate the expected minimax value and return the states list
+def expected_minimax(state, depth, player):
+    state_list = []
+    state_list.append(state)
+    
     if depth == 0 or is_full(state):
-        return heuristic(state)
+        return heuristic(state), state_list
 
     available_moves = get_available_moves(state)
-    if player:  # Maximizing player (AI)
+    if player:
         max_eval = float('-inf')
         for move in available_moves:
-            new_state = apply_move(state, move, 2)
-            eval = minimax(new_state, depth - 1, not player, alpha, beta)
-            max_eval = max(max_eval, eval)
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break  # Beta cutoff
-        return max_eval
-    else:  # Minimizing player (Human)
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval > max_eval:
+                max_eval = eval
+                state_list.extend(new_states)
+        return max_eval, state_list
+    else:
         min_eval = float('inf')
         for move in available_moves:
-            new_state = apply_move(state, move, 1)
-            eval = minimax(new_state, depth - 1, not player, alpha, beta)
-            min_eval = min(min_eval, eval)
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break  # Alpha cutoff
-        return min_eval
+            next_player = not player
+            new_state = apply_move(state, move, player + 1)
+            eval, new_states = expected_minimax(new_state, depth - 1, next_player)
+            if eval < min_eval:
+                min_eval = eval
+                state_list.extend(new_states)
+        return min_eval, state_list
 
-# Function to get the best move using minimax with alpha-beta pruning
-def get_best_move(state, depth):
-    best_move = None
-    max_eval = float('-inf')
-    available_moves = get_available_moves(state)
-    for move in available_moves:
-        next_player = False  # The AI is playing
-        new_state = apply_move(state, move, 2)  # AI's move
-        eval = minimax(new_state, depth - 1, next_player, float('-inf'), float('inf'))
-        if eval > max_eval:
-            max_eval = eval
-            best_move = move
-    return best_move
+# Adjusted get_best_move function to include probability-based disc placement
+class expectedMinimax:
+  def solve(self,stateL:State, depth,player):
+      state=[]
+      stateTWO=stateL.convertRepresentation()
+      state= [element for sublist in stateTWO for element in sublist]
+      best=[]
+      best_move = None
+      max_eval = float('-inf')
+      available_moves = get_available_moves(state)
+      for move in available_moves:
+          next_player = False  # The AI is playing
+
+        # Adjust probabilities for left and right adjacent columns
+          if move > 0 and move < 6:
+              moves = [move-1, move, move+1]
+              probabilities = [0.2, 0.6, 0.2]
+          elif move == 0:
+              moves = [move, move+1]
+              probabilities = [0.6, 0.4]
+          else:  # move == 6
+              moves = [move-1, move]
+              probabilities = [0.4, 0.6]
+
+        # Randomly select a move based on probabilities
+          chosen_move = random.choices(moves, probabilities)[0]
+
+          new_state = apply_move(state, chosen_move, 2)  # AI's move
+          eval = expected_minimax(new_state, depth - 1, next_player)[0]
+          if eval > max_eval:
+              max_eval = eval
+              best_move = chosen_move
+          
+          best.append(best_move)    
+      return best
+
 
 # Function to print the board
 def print_board(state):
@@ -132,6 +175,11 @@ def print_board(state):
         print(row)
     print()
 
+# Main function to print and call expected minimax function
+# ... (previous code remains the same)
+
+# Function to play the game
+# Function to play the game
 # Function to play the game
 def play_game():
     state_list = []
@@ -204,17 +252,3 @@ def main():
 
 if __name__ == "__main__":
     final_states_list = main()
-    print( final_states_list)
-
-
-
-
-
-
-
-
-
-
-
-
-

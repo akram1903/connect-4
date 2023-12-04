@@ -188,13 +188,11 @@ def agentTurn():
         if algoIndex==1:
             agent = MiniMax()
         elif algoIndex==0:
-            agent = None
-            print("not implemented yet")
-            return
+            agent = minimaxwithAlpha()
+           
         elif algoIndex==2:
-            agent = None
-            print("not implemented yet")
-            return
+            agent = expectedMinimax()
+           
 
         else:
             print("no agent selected","select an agent to start game",sep='\n')

@@ -116,19 +116,21 @@ def expected_minimax(state, depth, player):
         return min_eval, state_list
 
 # Function to get the best move using minimax with alpha-beta pruning
-def get_best_move(state, depth):
-    best_move = None
-    max_eval = float('-inf')
-    available_moves = get_available_moves(state)
-    for move in available_moves:
-        next_player = False  # The AI is playing
+class minimaxwithAlpha:
 
-        new_state = apply_move(state, move, 2)  # AI's move
-        eval = expected_minimax(new_state, depth - 1, next_player)[0]
-        if eval > max_eval:
-            max_eval = eval
-            best_move = move
-    return best_move
+    def solve(self,state, depth,player):
+       best_move = None
+       max_eval = float('-inf')
+       available_moves = get_available_moves(state)
+       for move in available_moves:
+           next_player = False  # The AI is playing
+
+           new_state = apply_move(state, move, 2)  # AI's move
+           eval = expected_minimax(new_state, depth - 1, next_player)[0]
+           if eval > max_eval:
+               max_eval = eval
+               best_move = move
+       return best_move
 
 # Function to print the board
 def print_board(state):
@@ -190,7 +192,7 @@ def play_game():
     return state_list, final_state
 
 # Main function to run the game
-def main():
+#def main():
     states_list, final_state = play_game()
     ai_sequences_final = count_sequences(final_state, 2)
     human_sequences_final = count_sequences(final_state, 1)
@@ -207,5 +209,5 @@ def main():
 
     return states_list
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     final_states_list = main()
