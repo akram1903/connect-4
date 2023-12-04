@@ -6,6 +6,7 @@ from state import *
 from algorithms.miniMax import *
 from algorithms.ExpectedMinimax import *
 from algorithms.minimaxWithAlpha import *
+import random
 
 TEST_COUNTER=1
 SCALE = 1
@@ -86,15 +87,130 @@ def insertIntoPuzzle(colNumber:int,player:int):
 def printKeys(event):
     print(event.keysym+" key pressed")
 
+def checkFinished():
+    global current_state
+
+    tmp = current_state.convertRepresentationWithoutReverse()
+
+    for i in range(6):
+        for j in range(7):
+            if tmp[i][j]==0:
+                return False
+            
+    return True
+
+def calculateWinner():
+    global current_state
+    temp = current_state.convertRepresentationWithoutReverse()
+    player = 2
+    opponent = 1
+    player_score = 0
+    opponent_score = 0
+
+    # Evaluate horizontally
+    for row in range(6):
+        for col in range(7 - 3):
+            window = [temp[row][col + i] for i in range(4)]
+            player_count = window.count(player)
+            opponent_count = window.count(opponent)
+            if player_count == 4:
+                player_score += 100
+
+            if opponent_count == 4:
+                opponent_score += 100
+            
+    # Evaluate vertically
+    for col in range(7):
+        for row in range(6 - 3):
+            window = [temp[row + i][col] for i in range(4)]
+            player_count = window.count(player)
+            opponent_count = window.count(opponent)
+            if player_count == 4:
+                player_score += 100
+            
+
+            if opponent_count == 4:
+                opponent_score += 100
+            
+
+    # Evaluate diagonally (top-left to bottom-right)
+    for row in range(6 - 3):
+        for col in range(7 - 3):
+            window = [temp[row + i][col + i] for i in range(4)]
+            player_count = window.count(player)
+            opponent_count = window.count(opponent)
+            if player_count == 4:
+                player_score += 100
+            
+            if opponent_count == 4:
+                opponent_score += 100
+            
+
+    # Evaluate diagonally (bottom-left to top-right)
+    for row in range(3, 6):
+        for col in range(7 - 3):
+            window = [temp[row - i][col + i] for i in range(4)]
+            player_count = window.count(player)
+            opponent_count = window.count(opponent)
+            if player_count == 4:
+                player_score += 100
+            
+
+            if opponent_count == 4:
+                opponent_score += 100
+            
+
+    if player_score-opponent_score == 0:
+        return 0
+    elif player_score-opponent_score < 0:
+        return 1
+    else:
+        return 2
+
+def finishGame():
+    global current_state,notificationLabel
+    
+    result = calculateWinner()
+
+    if result == 1:
+        print('human won')
+        notificationLabel.config(text='human won')
+    elif result == 2:
+        print('ai won')
+        notificationLabel.config(text='ai won')
+    else:
+        print('tie')
+        notificationLabel.config(text='tie')
+        
 def selectCol(event):
     global respond
     if respond:
         respond = False
         colSelected = 6 - (event.x//100)
         print('index of column selected:',colSelected)
+
+        if algoIndex==2:
+            r = random.randint(1,10)
+            # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
+            if r < 3:
+                if colSelected == 6:
+                    colSelected -= 1
+                else:
+                    colSelected += 1
+            elif r > 9:
+                if colSelected == 0:
+                    colSelected += 1
+                else:
+                    colSelected -= 1
+
+            print('col index after tripping ',colSelected)
         insertIntoPuzzle(colSelected,1)
 
         agentTurn()
+
+        if checkFinished():
+            finishGame()
+            return
         respond = True
 
 
@@ -123,8 +239,14 @@ def drawEnvironment():
     window.title("connect 4 with AI")
     window.config(background="#404258")
     window.resizable(False,False)
+    
+    global notificationLabel
+    notificationLabel = Label(window,text="notification label",font=('Arial',11),foreground='#D6E4E5',background="#404258")
+    notificationLabel.place(x=10*SCALE,y=400*SCALE)
+
     lable = Label(window,text="avg response time = ",font=('Arial',11),foreground='#D6E4E5',background="#404258")
     lable.place(x=450*SCALE,y=640*SCALE)
+
     global dataCollectionLable
     dataCollectionLable = Label(window,text="",font=('Arial',11),foreground='#D6E4E5',background="#404258")
     dataCollectionLable.place(x=600,y=640*SCALE)
@@ -199,11 +321,12 @@ def agentTurn():
             current_state = State(0)
             drawState(0)
             return
-    maxDepth = 4
+    maxDepth = 3
 
     startTime = time.time()    
     answer = agent.solve(current_state,maxDepth,True)
     t = time.time()-startTime
+    print_tree(current_state)
 
     if avgResponseTime is None:
         avgResponseTime = t

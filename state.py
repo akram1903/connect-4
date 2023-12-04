@@ -190,6 +190,13 @@ class State:
 
         return player_score - opponent_score
     
+def print_tree(node, depth=0):
+    if node is None:
+        return
+
+    print("  " * depth + "|__", node.representation)
+    for child in node.children:
+        print_tree(child, depth + 1)
     
 if __name__ == "__main__":
 
