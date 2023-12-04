@@ -29,26 +29,28 @@ class MiniMax:
                 state.makeChildren(2)
                 maxEvaState = None
 
+            
                 for i in range(len(state.children)):
                     if maxEvaState is None or state.children[i].Heuristic() > maxEvaState[1].Heuristic():
-                        maxEvaState = [i,state.children[i]]
+                        maxEvaState = [state.children[i].parCol,state.children[i]]
 
                 if maxEvaState is not None:
                     return maxEvaState
-                return [state.parCol,state.Heuristic()]
+                return [state.parCol,state]
             
             else:
                 minEvaState = None
 
                 state.makeChildren(1)
+    
                 for i in range(len(state.children)):
                     if minEvaState is None or state.children[i].Heuristic() < minEvaState[1].Heuristic():
-                        minEvaState = [i,state.children[i]]
+                        minEvaState = [state.children[i].parCol,state.children[i]]
 
                 if minEvaState is not None:
                     return minEvaState
                 
-                return [state.parCol,state.Heuristic()]
+                return [state.parCol,state]
 
         if maximizingPlayer:
             state.makeChildren(2)
@@ -63,11 +65,12 @@ class MiniMax:
             if maxEvaState is not None:
                 return maxEvaState
 
-            return [state.parCol,state.Heuristic()]
+            return [state.parCol,state]
         else:
             minEvaState = None
 
             state.makeChildren(1)
+            
             for i in range(len(state.children)):
                 evaState = self.solve(state.children[i],depth-1,True)
                 if minEvaState is None or evaState[1].Heuristic() < minEvaState[1].Heuristic():
@@ -76,11 +79,11 @@ class MiniMax:
             if minEvaState is not None: 
                 return minEvaState
             
-            return [state.parCol,state.Heuristic()]
+            return [state.parCol,state]
         
 
 if __name__ == "__main__":
-    test = State(1112121212121212121212121122122121212)
+    test = State(1111112121212121212121212121122122121212)
     print(test)
     alg = MiniMax()
     result = alg.solve(test,3,True)
