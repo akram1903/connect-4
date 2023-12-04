@@ -21,22 +21,7 @@ class ExpectiMiniMax:
     
     def __init__(self):
         pass
-    # try
-    r = random.randint(1,10)
-            # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
-        if r < 3:
-            if tmpCol == 6:
-                tmpCol -= 1
-            else:
-                tmpCol += 1
-        elif r > 9:
-            if tmpCol == 0:
-                tmpCol += 1
-            else:
-                tmpCol -= 1
-
-
-    # end try
+    
     
     def solve(self,state:State,depth:int,maximizingPlayer:bool,alpha:int=float('-inf'),beta:int=float('inf'))->list[int,State]:
         # maximizing is AI ,minimizing is human
@@ -78,8 +63,49 @@ class ExpectiMiniMax:
             state.makeChildren(2)
             maxEvaState = None
 
+        # ---------------expecti core----------------------
+
             for i in range(len(state.children)):
                 evaState = self.solve(state.children[i],depth-1,False,alpha,beta)
+                expecti = evaState[1].Heuristic()*0.6
+                neighbor2 = None
+                neighbor = None
+                if evaState[1].parCol>0 and evaState[1].parCol<6:
+                    if i+1 < len(state.children):
+                        neighbor = self.solve(state.children[i+1],depth-1,False,alpha,beta)
+                    if(neighbor is not None and neighbor[1].parCol+1 == evaState[1].parCol):
+                        expecti += neighbor[1].Heuristic()*0.2
+                    else:
+                        expecti += evaState[1].Heuristic()*0.2
+
+                    if i-1 >=0:
+                        neighbor2 = self.solve(state.children[i-1],depth-1,False,alpha,beta)
+                    
+                    if(neighbor2 is not None and neighbor2[1].parCol-1 == evaState[1].parCol):
+                        expecti += neighbor2[1].Heuristic()*0.2
+
+                    else:
+                        expecti += evaState[1].Heuristic()*0.2
+
+                elif evaState[1].parCol == 0:
+                    if i+1 < len(state.children):
+                        neighbor = self.solve(state.children[i+1],depth-1,False,alpha,beta)
+                    if(neighbor is not None and neighbor[1].parCol+1 == evaState[1].parCol):
+                        expecti += neighbor[1].Heuristic()*0.4
+                    else:
+                        expecti += evaState[1].Heuristic()*0.4
+                    
+                elif evaState[1].parCol == 6:
+                    if i-1>=0:
+                        neighbor2 = self.solve(state.children[i-1],depth-1,False,alpha,beta)
+                    
+                    if(neighbor2 is not None and neighbor2[1].parCol-1 == evaState[1].parCol):
+                        expecti += neighbor2[1].Heuristic()*0.4
+                    else:
+                        expecti += evaState[1].Heuristic()*0.4
+
+                evaState[1].heuristic = expecti
+
                 if maxEvaState is None or evaState[1].Heuristic() > maxEvaState[1].Heuristic():
                     maxEvaState = evaState
                     alpha = evaState[1].Heuristic()
@@ -97,7 +123,46 @@ class ExpectiMiniMax:
             
             for i in range(len(state.children)):
                 evaState = self.solve(state.children[i],depth-1,True,alpha,beta)
-                if minEvaState is None or evaState[1].Heuristic() < minEvaState[1].Heuristic():
+                expecti = evaState[1].Heuristic()*0.6
+                neighbor2 = None
+                neighbor = None
+                if evaState[1].parCol>0 and evaState[1].parCol<6:
+                    if i+1 < len(state.children):
+                        neighbor = self.solve(state.children[i+1],depth-1,False,alpha,beta)
+                    if(neighbor is not None and neighbor[1].parCol+1 == evaState[1].parCol):
+                        expecti += neighbor[1].Heuristic()*0.2
+                    else:
+                        expecti += evaState[1].Heuristic()*0.2
+
+                    if i-1 >=0:
+                        neighbor2 = self.solve(state.children[i-1],depth-1,False,alpha,beta)
+                    
+                    if(neighbor2 is not None and neighbor2[1].parCol-1 == evaState[1].parCol):
+                        expecti += neighbor2[1].Heuristic()*0.2
+                        
+                    else:
+                        expecti += evaState[1].Heuristic()*0.2
+                        
+                elif evaState[1].parCol == 0:
+                    if i+1 < len(state.children):
+                        neighbor = self.solve(state.children[i+1],depth-1,False,alpha,beta)
+                    if(neighbor is not None and neighbor[1].parCol+1 == evaState[1].parCol):
+                        expecti += neighbor[1].Heuristic()*0.4
+                    else:
+                        expecti += evaState[1].Heuristic()*0.4
+                    
+                elif evaState[1].parCol == 6:
+                    if i-1 >= 0:
+                        neighbor2 = self.solve(state.children[i-1],depth-1,False,alpha,beta)
+                    
+                    if(neighbor2 is not None and neighbor2[1].parCol-1 == evaState[1].parCol):
+                        expecti += neighbor2[1].Heuristic()*0.4
+                    else:
+                        expecti += evaState[1].Heuristic()*0.4
+
+                evaState[1].heuristic = expecti
+                
+                if minEvaState is None or expecti < minEvaState[1].Heuristic():
                     minEvaState = evaState
                     beta = evaState[1].Heuristic()
                     if beta <= alpha:

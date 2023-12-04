@@ -191,20 +191,26 @@ def selectCol(event):
 
         if algoIndex==2:
             r = random.randint(1,10)
+            expCol = colSelected
             # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
             if r < 3:
-                if colSelected == 6:
-                    colSelected -= 1
+                if expCol == 6:
+                    expCol -= 1
                 else:
-                    colSelected += 1
+                    expCol += 1
             elif r > 9:
-                if colSelected == 0:
-                    colSelected += 1
+                if expCol == 0:
+                    expCol += 1
                 else:
-                    colSelected -= 1
+                    expCol -= 1
 
             print('col index after tripping ',colSelected)
-        insertIntoPuzzle(colSelected,1)
+
+            if not insertIntoPuzzle(expCol,1):
+                insertIntoPuzzle(colSelected,1)
+        else:
+            insertIntoPuzzle(colSelected,1)
+            
 
         agentTurn()
 
@@ -276,31 +282,6 @@ def resetPuzzle(event = None):
     drawState(0)
     
 
-
-# def buildTile(num):
-    
-#     global tileIndex,entrySet,startState
-#     if tileIndex < 9 :
-#         if num not in entrySet:
-#             entrySet.add(num)
-#             i=tileIndex//3
-#             j=tileIndex%3
-
-#             if num is not None:
-#                 startState.matrix[i][j] = int(num)
-#             else:
-#                 startState.matrix[i][j] = None
-#             ShowPuzzle(startState)
-#             tileIndex += 1
-#         else:
-#             print("number entered before")
-#     if entrySet.__len__()==9:
-#         startButton = Button(window,foreground='#D6E4E5',background="#50577A",text='start',command=startSolve,font=('arial',18))
-#         startButton.place(x=SCALE*700,y=SCALE*(300))
-#         resetButton = Button(window,foreground='#D6E4E5',background="#50577A",text='reset',command=resetPuzzle,font=('arial',14))
-#         resetButton.place(x=SCALE*700,y=SCALE*(550))
-        
-
 def agentTurn():
     global agent,current_state,dataCollectionLable,countAgentPlays,avgResponseTime
 
@@ -349,11 +330,11 @@ def agentTurn():
                 tmpCol += 1
             else:
                 tmpCol -= 1
-
-        
+                
         print('col index after tripping ',tmpCol)
-        insertIntoPuzzle(tmpCol,2)
 
+        if(not insertIntoPuzzle(tmpCol,2)):
+            insertIntoPuzzle(answer[0],2)
 
     else:
         insertIntoPuzzle(answer[0],2)

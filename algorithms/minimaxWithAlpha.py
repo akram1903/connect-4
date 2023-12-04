@@ -98,7 +98,7 @@ class MiniMaxWithAlpha:
 if __name__ == "__main__":
     test = State(1111112121212121212121212121122122121212)
     print(test)
-    alg = MiniMax()
+    alg = MiniMaxWithAlpha()
     result = alg.solve(test,3,True)
 
     print(result[0])
