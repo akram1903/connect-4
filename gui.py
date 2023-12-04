@@ -310,10 +310,10 @@ def agentTurn():
         if algoIndex==1:
             agent = MiniMax()
         elif algoIndex==0:
-            agent = minimaxwithAlpha()
+            agent = MiniMaxWithAlpha()
            
         elif algoIndex==2:
-            agent = expectedMinimax()
+            agent = ExpectiMiniMax()
            
 
         else:
@@ -334,7 +334,29 @@ def agentTurn():
         avgResponseTime = (avgResponseTime*countAgentPlays+t)/(countAgentPlays+1)
     countAgentPlays += 1
     dataCollectionLable.config(text=f'{avgResponseTime} secs')
-    insertIntoPuzzle(answer[0],2)
+
+    if algoIndex == 2:
+        tmpCol = answer[0]
+        r = random.randint(1,10)
+            # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
+        if r < 3:
+            if tmpCol == 6:
+                tmpCol -= 1
+            else:
+                tmpCol += 1
+        elif r > 9:
+            if tmpCol == 0:
+                tmpCol += 1
+            else:
+                tmpCol -= 1
+
+        
+        print('col index after tripping ',tmpCol)
+        insertIntoPuzzle(tmpCol,2)
+
+
+    else:
+        insertIntoPuzzle(answer[0],2)
 
 def drawRadioButtons():
 
