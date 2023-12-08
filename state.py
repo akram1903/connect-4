@@ -97,11 +97,10 @@ class State:
     def __hash__(self) -> int:
         return self.representation
     
-    # should be discussed
     def Heuristic(self) -> int:
         if self.heuristic is not None:
             return self.heuristic
-    # this heuristic is only for test .. this is a simple heuristic
+
         temp = self.convertRepresentationWithoutReverse()
         player = 2
         opponent = 1
