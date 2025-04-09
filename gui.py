@@ -7,6 +7,7 @@ from algorithms.miniMax import *
 from algorithms.ExpectedMinimax import *
 from algorithms.minimaxWithAlpha import *
 import random
+from newMiniMax import MiniMaxNew
 
 TEST_COUNTER=1
 SCALE = 1
@@ -25,7 +26,7 @@ current_state = State(0)
     
 algoIndex = -1
 agent = None
-algorithms = ["minimax with prunning","minimax without prunning","expected minimax"]
+algorithms = ["minimax with prunning","minimax without prunning","new minimax"]
 
 
 def drag_start(event):
@@ -189,27 +190,27 @@ def selectCol(event):
         colSelected = 6 - (event.x//100)
         print('index of column selected:',colSelected)
 
-        if algoIndex==2:
-            r = random.randint(1,10)
-            expCol = colSelected
-            # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
-            if r < 3:
-                if expCol == 6:
-                    expCol -= 1
-                else:
-                    expCol += 1
-            elif r > 9:
-                if expCol == 0:
-                    expCol += 1
-                else:
-                    expCol -= 1
+        # if algoIndex==2:
+        #     r = random.randint(1,10)
+        #     expCol = colSelected
+        #     # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
+        #     if r < 3:
+        #         if expCol == 6:
+        #             expCol -= 1
+        #         else:
+        #             expCol += 1
+        #     elif r > 9:
+        #         if expCol == 0:
+        #             expCol += 1
+        #         else:
+        #             expCol -= 1
 
-            print('col index after tripping ',colSelected)
+        #     print('col index after tripping ',colSelected)
 
-            if not insertIntoPuzzle(expCol,1):
-                insertIntoPuzzle(colSelected,1)
-        else:
-            insertIntoPuzzle(colSelected,1)
+            # if not insertIntoPuzzle(expCol,1):
+            #     insertIntoPuzzle(colSelected,1)
+        # else:
+        insertIntoPuzzle(colSelected,1)
             
 
         agentTurn()
@@ -272,7 +273,7 @@ def selectWhithoutPrun():
     
     print(algorithms[algoIndex],"selected")
 
-def SelectExpectedMinimax():
+def SelectNewMinimax():
     global algoIndex
     algoIndex = 2
     print(algorithms[algoIndex],"selected")
@@ -294,7 +295,7 @@ def agentTurn():
             agent = MiniMaxWithAlpha()
            
         elif algoIndex==2:
-            agent = ExpectiMiniMax()
+            agent = MiniMaxNew()
            
 
         else:
@@ -302,12 +303,12 @@ def agentTurn():
             current_state = State(0)
             drawState(0)
             return
-    maxDepth = 3
+    maxDepth = 5
 
     startTime = time.time()    
     answer = agent.solve(current_state,maxDepth,True)
     t = time.time()-startTime
-    print_tree(current_state)
+    # print_tree(current_state)
 
     if avgResponseTime is None:
         avgResponseTime = t
@@ -316,28 +317,28 @@ def agentTurn():
     countAgentPlays += 1
     dataCollectionLable.config(text=f'{avgResponseTime} secs')
 
-    if algoIndex == 2:
-        tmpCol = answer[0]
-        r = random.randint(1,10)
-            # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
-        if r < 3:
-            if tmpCol == 6:
-                tmpCol -= 1
-            else:
-                tmpCol += 1
-        elif r > 9:
-            if tmpCol == 0:
-                tmpCol += 1
-            else:
-                tmpCol -= 1
+    # if algoIndex == 2:
+    #     tmpCol = answer[0]
+    #     r = random.randint(1,10)
+    #         # 1 and 2 left -- 3 to 8 mid -- 9 and 10 right
+    #     if r < 3:
+    #         if tmpCol == 6:
+    #             tmpCol -= 1
+    #         else:
+    #             tmpCol += 1
+    #     elif r > 9:
+    #         if tmpCol == 0:
+    #             tmpCol += 1
+    #         else:
+    #             tmpCol -= 1
                 
-        print('col index after tripping ',tmpCol)
+    #     print('col index after tripping ',tmpCol)
 
-        if(not insertIntoPuzzle(tmpCol,2)):
-            insertIntoPuzzle(answer[0],2)
+    #     if(not insertIntoPuzzle(tmpCol,2)):
+    #         insertIntoPuzzle(answer[0],2)
 
-    else:
-        insertIntoPuzzle(answer[0],2)
+    # else:
+    insertIntoPuzzle(answer[0],2)
 
 def drawRadioButtons():
 
@@ -354,7 +355,7 @@ def drawRadioButtons():
     radioB.place(x=SCALE*20,y=SCALE*(50*2))
 
     radioB = Radiobutton(window,text=algorithms[2],variable=x,value=0, font=('arial',11),
-                        foreground='#D6E4E5',background="#404258",command=SelectExpectedMinimax)
+                        foreground='#D6E4E5',background="#404258",command=SelectNewMinimax)
     
     radioB.place(x=SCALE*20,y=SCALE*(50*3))
 

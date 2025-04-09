@@ -82,6 +82,11 @@ class State:
 
         return result
     
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value,State):
+            return False
+        return self.representation == value.representation
+    
     def __str__(self) -> str:
         tempInt = self.representation
         result:str ='\n'
@@ -189,6 +194,13 @@ class State:
 
         return player_score - opponent_score
     
+    def isTerminal(self):
+        tmp:int = self.representation
+        for _ in range(6*7):
+            if tmp%10 == 0:
+                return False
+            tmp //= 10
+        return True
 def print_tree(node, depth=0):
     if node is None:
         return
@@ -196,6 +208,8 @@ def print_tree(node, depth=0):
     print("  " * depth + "|__", node.representation)
     for child in node.children:
         print_tree(child, depth + 1)
+
+
     
 if __name__ == "__main__":
 
